@@ -1,12 +1,13 @@
 package main
 
 import (
+	"log"
+	"net"
+
 	"github.com/front-go/auth/internal/repository"
 	"github.com/front-go/auth/internal/service"
 	"github.com/front-go/auth/pkg/auth"
 	"google.golang.org/grpc"
-	"log"
-	"net"
 )
 
 func main() {
