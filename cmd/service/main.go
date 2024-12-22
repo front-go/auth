@@ -4,10 +4,11 @@ import (
 	"log"
 	"net"
 
+	"google.golang.org/grpc"
+
 	"github.com/front-go/auth/internal/repository"
 	"github.com/front-go/auth/internal/service"
 	"github.com/front-go/auth/pkg/auth"
-	"google.golang.org/grpc"
 )
 
 func main() {
