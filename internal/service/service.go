@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/front-go/auth/pkg/auth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,6 +26,19 @@ func (s *Service) Signup(ctx context.Context, in *auth.SignupIn) (*auth.SignupOu
 		return nil, status.Error(codes.FailedPrecondition, "failed to insert user")
 	}
 	return &auth.SignupOut{
+		Success: true,
+	}, nil
+}
+
+func (s *Service) Login(ctx context.Context, in *auth.LoginIn) (*auth.LoginOut, error) {
+	storedPassword, err := s.dbR.GetPassword(ctx, in.Username)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "user not found")
+	}
+	if storedPassword != in.Password {
+		return nil, status.Error(codes.Unauthenticated, "invalid credentials")
+	}
+	return &auth.LoginOut{
 		Success: true,
 	}, nil
 }

@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"log"
+
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"log"
 )
 
 type Repository struct {
@@ -38,4 +40,17 @@ func (r *Repository) Insert(ctx context.Context, username, password string) erro
 		return fmt.Errorf("insert username %s failed: %w", username, err)
 	}
 	return nil
+}
+
+func (r *Repository) GetPassword(ctx context.Context, username string) (string, error) {
+	query := `SELECT password FROM participant WHERE username = $1`
+	var password string
+	err := r.conn.QueryRowContext(ctx, query, username).Scan(&password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", fmt.Errorf("username %s not found", username)
+		}
+		return "", fmt.Errorf("failed to get password for username %s: %w", username, err)
+	}
+	return password, nil
 }
