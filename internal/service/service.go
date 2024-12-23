@@ -42,3 +42,20 @@ func (s *Service) Login(ctx context.Context, in *auth.LoginIn) (*auth.LoginOut, 
 		Success: true,
 	}, nil
 }
+
+func (s *Service) ChangePassword(ctx context.Context, in *auth.ChangePasswordIn) (*auth.ChangePasswordOut, error) {
+	storedPassword, err := s.dbR.GetPassword(ctx, in.Username)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "user not found")
+	}
+
+	if storedPassword != in.Password {
+		return nil, status.Error(codes.Unauthenticated, "invalid credentials")
+	}
+
+	response, err := s.dbR.UpdatePassword(ctx, in.Username, in.Password, in.NewPassword)
+
+	return &auth.ChangePasswordOut{
+		Response: response,
+	}, err
+}

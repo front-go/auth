@@ -54,3 +54,12 @@ func (r *Repository) GetPassword(ctx context.Context, username string) (string, 
 	}
 	return password, nil
 }
+
+func (r *Repository) UpdatePassword(ctx context.Context, username, password, new_password string) (string, error) {
+	query := `UPDATE participant SET password =$3  WHERE username = $1 AND password=$2 `
+	_, err := r.conn.ExecContext(ctx, query, username, password, new_password)
+	if err != nil {
+		return "", fmt.Errorf("Не удалось изменить пароль")
+	}
+	return "Пароль успешно изменен", nil
+}
