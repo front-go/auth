@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"errors"
+	"github.com/front-go/auth/internal/repository"
+	"log"
 
 	"github.com/front-go/auth/pkg/auth"
 	"google.golang.org/grpc/codes"
@@ -23,6 +26,10 @@ func (s *Service) Signup(ctx context.Context, in *auth.SignupIn) (*auth.SignupOu
 	}
 	err := s.dbR.Insert(ctx, in.Username, in.Password)
 	if err != nil {
+		if errors.Is(err, repository.ErrAlreadyExist) {
+			return nil, status.Error(codes.AlreadyExists, "Пользователь уже существует")
+		}
+		log.Printf("failed to insert data: %v", err)
 		return nil, status.Error(codes.FailedPrecondition, "failed to insert user")
 	}
 	return &auth.SignupOut{

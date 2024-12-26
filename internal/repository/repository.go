@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -14,6 +15,10 @@ type Repository struct {
 	storage map[string]string
 	conn    *sqlx.DB
 }
+
+var (
+	ErrAlreadyExist = errors.New("username already exists")
+)
 
 func NewRepository() *Repository {
 	st := make(map[string]string)
@@ -30,14 +35,14 @@ func NewRepository() *Repository {
 
 func (r *Repository) Insert(ctx context.Context, username, password string) error {
 	if _, ok := r.storage[username]; ok {
-		return fmt.Errorf("username %s already exists", username)
+		return ErrAlreadyExist
 	}
 	r.storage[username] = password
 
 	query := `INSERT INTO participant (username, password) VALUES ($1, $2)`
 	_, err := r.conn.ExecContext(ctx, query, username, password)
 	if err != nil {
-		return fmt.Errorf("insert username %s failed: %w", username, err)
+		return err
 	}
 	return nil
 }
@@ -47,7 +52,7 @@ func (r *Repository) GetPassword(ctx context.Context, username string) (string, 
 	var password string
 	err := r.conn.QueryRowContext(ctx, query, username).Scan(&password)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return "", fmt.Errorf("username %s not found", username)
 		}
 		return "", fmt.Errorf("failed to get password for username %s: %w", username, err)
