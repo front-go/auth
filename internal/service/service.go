@@ -3,8 +3,9 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/front-go/auth/internal/repository"
 	"log"
+
+	"github.com/front-go/auth/internal/repository"
 
 	"github.com/front-go/auth/pkg/auth"
 	"google.golang.org/grpc/codes"

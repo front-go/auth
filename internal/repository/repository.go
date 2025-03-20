@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/front-go/auth/internal/config"
+
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
@@ -20,11 +22,11 @@ var (
 	ErrAlreadyExist = errors.New("username already exists")
 )
 
-func NewRepository() *Repository {
+func NewRepository(cfg *config.Config) *Repository {
 	st := make(map[string]string)
 
 	connectCmd := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
-		"master", "master", "master", "localhost", "3125")
+		cfg.Postgres.User, cfg.Postgres.Password, cfg.Postgres.Database, cfg.Postgres.Host, cfg.Postgres.Port)
 
 	conn, err := sqlx.Connect("postgres", connectCmd)
 	if err != nil {

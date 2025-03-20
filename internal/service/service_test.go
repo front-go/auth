@@ -3,11 +3,12 @@ package service
 import (
 	"context"
 	"errors"
+	"testing"
+
 	"github.com/front-go/auth/internal/repository"
 	"github.com/front-go/auth/pkg/auth"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestService_Signup(t *testing.T) {
