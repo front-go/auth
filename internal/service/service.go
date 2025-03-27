@@ -14,11 +14,12 @@ import (
 
 type Service struct {
 	auth.UnimplementedAuthServiceServer
-	dbR DbRepo
+	dbR    DbRepo
+	kafkaP KafkaProducer
 }
 
-func NewService(dbR DbRepo) *Service {
-	return &Service{dbR: dbR}
+func NewService(dbR DbRepo, kafkaP KafkaProducer) *Service {
+	return &Service{dbR: dbR, kafkaP: kafkaP}
 }
 
 func (s *Service) Signup(ctx context.Context, in *auth.SignupIn) (*auth.SignupOut, error) {
@@ -33,6 +34,7 @@ func (s *Service) Signup(ctx context.Context, in *auth.SignupIn) (*auth.SignupOu
 		log.Printf("failed to insert data: %v", err)
 		return nil, status.Error(codes.FailedPrecondition, "failed to insert user")
 	}
+	s.kafkaP.Create(ctx, []byte(in.Username))
 	return &auth.SignupOut{
 		Success: true,
 	}, nil

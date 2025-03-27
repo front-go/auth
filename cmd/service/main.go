@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/front-go/auth/internal/databus/producer_user_create"
 	"log"
 	"net"
 
@@ -17,8 +18,9 @@ func main() {
 	cfg := config.MustLoad()
 
 	repo := repository.NewRepository(cfg)
+	kfk := producer_user_create.New()
 
-	srv := service.NewService(repo)
+	srv := service.NewService(repo, kfk)
 
 	grpcSrv := grpc.NewServer()
 

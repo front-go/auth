@@ -8,3 +8,7 @@ type DbRepo interface {
 	GetPassword(ctx context.Context, username string) (string, error)
 	UpdatePassword(ctx context.Context, username, password, new_password string) (string, error)
 }
+
+type KafkaProducer interface {
+	Create(ctx context.Context, message []byte)
+}
